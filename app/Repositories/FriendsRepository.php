@@ -46,7 +46,7 @@ class FriendsRepository implements FriendsRepositoryInterface
     {
         try {
             $req = $this->friends->create($data);;
-            Mail::to(['email'=>$email])->queue(new FriendRequest($req));
+            Mail::to(['email' => $email])->queue(new FriendRequest($req));
 
             return true;
         } catch (\Exception $e) {
@@ -61,7 +61,7 @@ class FriendsRepository implements FriendsRepositoryInterface
     public function createFriendAfterAccept(array $data)
     {
         try {
-             $this->friends->create($data);
+            $this->friends->create($data);
 
             return true;
         } catch (\Exception $e) {
@@ -171,11 +171,10 @@ class FriendsRepository implements FriendsRepositoryInterface
      */
     public function getFriendDetailsByToken($token)
     {
-       return $data = $this->friends->select(
-            'user_id','friend_id','is_accepted'
+        return $data = $this->friends->select(
+            'user_id', 'friend_id', 'is_accepted'
         )->where('status', 1)
             ->where('request_token', $token)
             ->first();
-
     }
 }

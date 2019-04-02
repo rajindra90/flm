@@ -131,7 +131,6 @@ class FriendsController extends Controller
         return response()->json([
             'message' => 'Successfully deleted friend!',
         ], 200);
-
     }
 
     /**
@@ -161,7 +160,6 @@ class FriendsController extends Controller
         return response()->json([
             'message' => 'Successfully accept friend request!',
         ], 200);
-
     }
 
     /**

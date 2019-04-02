@@ -43,7 +43,6 @@ class AuthRepository implements AuthRepositoryInterface
         } catch (\Exception $e) {
             return $e->getMessage();
         }
-
     }
 
     /**
@@ -52,9 +51,9 @@ class AuthRepository implements AuthRepositoryInterface
      */
     public function confirmEmail($tokan)
     {
-        if($this->users->where('email_verified_token', $tokan)->update(['email_confirm' => 1])){
+        if ($this->users->where('email_verified_token', $tokan)->update(['email_confirm' => 1])) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -78,8 +77,6 @@ class AuthRepository implements AuthRepositoryInterface
         } else {
             return false;
         }
-
-
     }
 
     /**
@@ -94,5 +91,4 @@ class AuthRepository implements AuthRepositoryInterface
             ->where('email', $email)
             ->first();
     }
-
 }

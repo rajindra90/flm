@@ -55,7 +55,6 @@ class AuthController extends Controller
                 'message' => $data
             ], 500);
         }
-
     }
 
     /**
@@ -150,6 +149,5 @@ class AuthController extends Controller
                 'message' => $data
             ], 500);
         }
-
     }
 }
