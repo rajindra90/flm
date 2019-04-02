@@ -17,8 +17,9 @@
 6. Install passport **`php artisan passport:install`**
 7. Install NPM globally if you haven't installed that already.
 8. After installing NPM globally , run **`npm install`** inside your webroot , it will download all the required dependencies.
-9. Run **`npm run dev`** for compiling sass and js files.
-10.  You are ready to launch!
+9. Run **`php artisan serve`** for run laravel app.
+10. Run **`npm run dev`** for compiling sass and js files.
+11.  You are ready to launch!
 
 **Technologies**
 ****
