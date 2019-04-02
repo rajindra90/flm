@@ -9,8 +9,10 @@
 namespace App\Repositories;
 
 use App\Friends;
+use App\Mail\FriendRequest;
 use App\User;
 use App\Repositories\Contracts\FriendsRepositoryInterface;
+use Illuminate\Support\Facades\Mail;
 
 class FriendsRepository implements FriendsRepositoryInterface
 {
@@ -37,11 +39,34 @@ class FriendsRepository implements FriendsRepositoryInterface
 
     /**
      * @param array $data
+     * @param $email
      * @return mixed
      */
-    public function createFriendRequest(array $data)
+    public function createFriendRequest(array $data, $email)
     {
-        return $this->friends->create($data);
+        try {
+            $req = $this->friends->create($data);;
+            Mail::to(['email'=>$email])->queue(new FriendRequest($req));
+
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * @param array $data
+     * @return bool|string
+     */
+    public function createFriendAfterAccept(array $data)
+    {
+        try {
+             $this->friends->create($data);
+
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -93,7 +118,7 @@ class FriendsRepository implements FriendsRepositoryInterface
         return $this->friends->join('users', 'users.id', 'friends.friend_id')
             ->where('friends.user_id', $userId)
             ->where('friends.status', 1)
-            ->select('friends.id','users.first_name', 'users.last_name', 'users.email', 'friends.is_accepted')
+            ->select('friends.id', 'users.first_name', 'users.last_name', 'users.email', 'friends.is_accepted')
             ->paginate(10);
     }
 
@@ -102,7 +127,8 @@ class FriendsRepository implements FriendsRepositoryInterface
      * @param $id
      * @return mixed
      */
-    public function deleteFriend($data, $id){
+    public function deleteFriend($data, $id)
+    {
         return $this->friends->where('id', $id)->update($data);
     }
 
@@ -116,7 +142,7 @@ class FriendsRepository implements FriendsRepositoryInterface
             ->where('friends.friend_id', $userId)
             ->where('friends.status', 1)
             ->where('friends.is_accepted', 0)
-            ->select('friends.id','friends.user_id','users.first_name', 'users.last_name', 'users.email', 'friends.is_accepted')
+            ->select('friends.id', 'friends.user_id', 'users.first_name', 'users.last_name', 'users.email', 'friends.is_accepted')
             ->paginate(10);
     }
 
@@ -125,7 +151,31 @@ class FriendsRepository implements FriendsRepositoryInterface
      * @param $id
      * @return mixed
      */
-    public function acceptRequest($data, $id){
+    public function acceptRequest($data, $id)
+    {
         return $this->friends->where('id', $id)->update($data);
+    }
+
+    /**
+     * @param $tokan
+     * @return mixed
+     */
+    public function requestEmailAccept($tokan)
+    {
+        return $this->friends->where('request_token', $tokan)->update(['is_accepted' => 1]);
+    }
+
+    /**
+     * @param $token
+     * @return mixed
+     */
+    public function getFriendDetailsByToken($token)
+    {
+       return $data = $this->friends->select(
+            'user_id','friend_id','is_accepted'
+        )->where('status', 1)
+            ->where('request_token', $token)
+            ->first();
+
     }
 }

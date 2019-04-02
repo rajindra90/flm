@@ -29,12 +29,12 @@ const store = new Vuex.Store({
                     axios.post('/logout').then(response => {
                         localStorage.removeItem('access_token')
                         context.commit('destroyToken')
-                        this.$router.push({name: '/'});
+                        location.reload();
                         resolve(response)
                     }).catch(error => {
                         localStorage.removeItem('access_token')
                         context.commit('destroyToken')
-                        this.$router.push({name: '/'});
+                        location.reload();
                         reject(error);
                     })
                 })
@@ -49,9 +49,7 @@ const store = new Vuex.Store({
                     password: data.data.password,
                     password_confirmation: data.data.confirm_password
                 }).then(response => {
-                    const token = response.data.access_token
-                    localStorage.setItem('access_token', token)
-                    context.commit('retrieveToken', token)
+                    resolve(response)
                 }).catch(error => {
                     reject(error);
                 })
@@ -72,7 +70,17 @@ const store = new Vuex.Store({
                 })
             })
         },
-        sendFriendRequest(context, data) {
+        resendEmail(context, data) {
+            return new Promise((resolve, reject) => {
+                axios.post('/resend/email', {
+                    email : data.data.email
+                }).then(response => {
+                    resolve(response)
+                }).catch(error => {
+                    reject(error);
+                })
+            })
+        },sendFriendRequest(context, data) {
             axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
             return new Promise((resolve, reject) => {
                 axios.post('/invite', {

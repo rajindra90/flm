@@ -15,6 +15,9 @@ use Illuminate\Support\Str;
 class AuthController extends Controller
 {
 
+    /**
+     * @var AuthRepository
+     */
     private $authRepo;
 
     public function __construct(AuthRepository $authRepo)
@@ -35,19 +38,24 @@ class AuthController extends Controller
             'password' => 'required|confirmed|min:6'
         ]);
 
-        /*return User::create([
+        $data = $this->authRepo->create([
             'first_name' => $request['first_name'],
             'last_name' => $request['last_name'],
             'email' => $request['email'],
-            'password' => Hash::make($request['password']),
-        ]);*/
-        return $this->authRepo->create([
-            'first_name' => $request['first_name'],
-            'last_name' => $request['last_name'],
-            'email' => $request['email'],
-            'email_verified_token' => Str::random(40).time(),
+            'email_verified_token' => Str::random(40) . time(),
             'password' => Hash::make($request['password']),
         ]);
+
+        if ($data) {
+            return response()->json([
+                'message' => 'User has been created Successfully.Please confirm your email.'
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => $data
+            ], 500);
+        }
+
     }
 
     /**
@@ -63,7 +71,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials)) {
             return response()->json([
-                'message' => 'Unauthorized'
+                'message' => 'Email or password is incorrect'
             ], 401);
         }
         $user = $request->user();
@@ -82,8 +90,6 @@ class AuthController extends Controller
 
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
-        /*if ($request->remember_me)
-            $token->expires_at = Carbon::now()->addWeeks(1);*/
         $token->save();
 
         return response()->json([
@@ -106,12 +112,44 @@ class AuthController extends Controller
         });
     }
 
+    /**
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function confirmEmail()
     {
         $token = Input::get('token', false);
 
-        $this->authRepo->confirmEmail($token);
+        if ($this->authRepo->confirmEmail($token)) {
+            return Redirect::to('/#/confirm');
+        } else {
+            return Redirect::to('/#/notconfirm');
+        }
+    }
 
-        return  Redirect::to('/#/confirm');
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function resendEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email'
+        ]);
+
+        $data = $this->authRepo->resendEmail($request->email, [
+            'email_verified_token' => Str::random(40) . time()
+        ]);
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Confirmation email has been sent again.Please confirm your email',
+                'email' => $request['email']
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => $data
+            ], 500);
+        }
+
     }
 }

@@ -7,19 +7,18 @@
                         <h5 class="card-title text-center">Sign In</h5>
                         <div class="card-body">
                             <div class="alert alert-danger" v-if="has_error && !success">
-                                <p v-if="error">Erreur(s) de validation, veuillez consulter le(s) message(s) ci-dessous.</p>
-                                <p v-else>Erreur, impossible de s'inscrire pour le moment. Si le problème persiste, veuillez contacter un administrateur.</p>
+                                <p v-if="error">{{error}}</p>
                             </div>
                         </div>
                         <form class="form-signin" autocomplete="off" @submit.prevent="login" method="post">
                             <div class="form-label-group">
-                                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" v-model="email">
+                                <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email address" v-model="email">
                                 <label for="inputEmail">Email address</label>
                                 <span class="help-block" v-if="has_error && errors.email">{{ errors.email }}</span>
                             </div>
 
                             <div class="form-label-group">
-                                <input type="password" id="inputPassword" class="form-control" placeholder="Password" v-model="password">
+                                <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" v-model="password">
                                 <label for="inputPassword">Password</label>
                                 <span class="help-block"
                                       v-if="has_error && errors.password">{{ errors.password }}</span>
@@ -29,7 +28,7 @@
                                 <input type="checkbox" class="custom-control-input" id="customCheck1">
                                 <label class="custom-control-label" for="customCheck1">Remember password</label>
                             </div>
-                            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Sign in</button>
+                            <button class="btn btn-lg btn-primary btn-block text-uppercase" name="signIn" type="submit">Sign in</button>
                             <hr class="my-4">
                             <a class="btn btn-lg btn-danger btn-block text-uppercase" href="#/register">Sign Up</a>
                         </form>
@@ -64,7 +63,7 @@
                     this.$router.push({name:'friendslist'});
                 }).catch(error => {
                     this.has_error = true;
-                    this.error = error.response.data.error
+                    this.error = error.response.data.message
                     this.errors = error.response.data.errors || {}
                 })
             }

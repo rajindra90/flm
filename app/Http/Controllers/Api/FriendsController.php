@@ -6,7 +6,9 @@ use App\Repositories\FriendsRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Friends AS FriendsResource;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 
 class FriendsController extends Controller
 {
@@ -51,7 +53,9 @@ class FriendsController extends Controller
         ]);
 
         $userId = $request->user()->id;
-        $friendId = $this->friendsRepo->getFriendId($request['email']);
+        $email = $request['email'];
+
+        $friendId = $this->friendsRepo->getFriendId($email);
 
         if ($userId == $friendId) {
             return response()->json([
@@ -77,10 +81,21 @@ class FriendsController extends Controller
             ], 412);
         }
 
-        return $this->friendsRepo->createFriendRequest([
+        $data = $this->friendsRepo->createFriendRequest([
             'user_id' => $userId,
-            'friend_id' => $friendId
-        ]);
+            'friend_id' => $friendId,
+            'request_token' => Str::random(40) . time(),
+        ], $email);
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Friend request has been sent.'
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => $data
+            ], 500);
+        }
     }
 
     /**
@@ -137,7 +152,7 @@ class FriendsController extends Controller
         $this->friendsRepo->acceptRequest($data, $request->id);
 
         $userId = $request->user()->id;
-         $this->friendsRepo->createFriendRequest([
+        $this->friendsRepo->createFriendAfterAccept([
             'user_id' => $userId,
             'friend_id' => $request->friend_id,
             'is_accepted' => 1
@@ -149,13 +164,21 @@ class FriendsController extends Controller
 
     }
 
-    public function sendEmail(){
-        $data = array('name'=>"Virat Gandhi");
-        Mail::send(['text'=>'mail'], $data, function($message) {
-            $message->to('vprprabodhitha@gmail.com', 'Tutorials Point')->subject
-            ('Laravel Basic Testing Mail');
-            $message->from('xyz@gmail.com','Virat Gandhi');
-        });
-        echo "Basic Email Sent. Check your inbox.";
+    /**
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function requestEmailAccept()
+    {
+        $token = Input::get('token', false);
+
+        $frndData = $this->friendsRepo->getFriendDetailsByToken($token);
+        $this->friendsRepo->requestEmailAccept($token);
+        $this->friendsRepo->createFriendAfterAccept([
+            'user_id' => $frndData->friend_id,
+            'friend_id' => $frndData->user_id,
+            'is_accepted' => 1
+        ]);
+
+        return Redirect::to('/#/friendslist');
     }
 }

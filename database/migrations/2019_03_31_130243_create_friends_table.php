@@ -18,6 +18,7 @@ class CreateFriendsTable extends Migration
             $table->integer('user_id');
             $table->integer('friend_id');
             $table->boolean('is_accepted')->default(false)->comment('0: not accepted; 1:accepted');
+            $table->string('request_token')->nullable();
             $table->boolean('status')->default(true)->comment('0: deleted; 1:active');
             $table->timestamps();
         });

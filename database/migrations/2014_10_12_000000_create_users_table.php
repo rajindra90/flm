@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('last_name');
             $table->string('email')->unique();
             $table->boolean('email_confirm')->default(false)->comment('0: not confirmed; 1:confirmed');
+            $table->string('email_verified_token');
             $table->boolean('status')->default(true)->comment('0: deleted; 1:active');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

@@ -15,4 +15,8 @@ interface AuthRepositoryInterface
     public function create(array $data);
 
     public function confirmEmail($token);
+
+    public function resendEmail($email, $data);
+
+    public function getUserByEmail($email);
 }

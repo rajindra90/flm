@@ -37,18 +37,62 @@ class AuthRepository implements AuthRepositoryInterface
     {
         try {
             $user = $this->users->create($data);
-            Mail::to($user)->send(new ConfirmAccount($user));
+            Mail::to($user)->queue(new ConfirmAccount($user));
 
-            return $user;
+            return true;
         } catch (\Exception $e) {
-
+            return $e->getMessage();
         }
 
     }
 
+    /**
+     * @param $tokan
+     * @return mixed
+     */
     public function confirmEmail($tokan)
     {
-        return $this->users->where('email_verified_token', $tokan)->update(['email_confirm' => 1]);
+        if($this->users->where('email_verified_token', $tokan)->update(['email_confirm' => 1])){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * @param $email
+     * @param $data
+     * @return bool|string
+     */
+    public function resendEmail($email, $data)
+    {
+        if ($this->users->where('email', $email)->update($data)) {
+            try {
+                $user = $this->getUserByEmail($email);
+                Mail::to($user)->queue(new ConfirmAccount($user));
+                return true;
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
+
+        } else {
+            return false;
+        }
+
+
+    }
+
+    /**
+     * @param $email
+     * @return mixed
+     */
+    public function getUserByEmail($email)
+    {
+        return $this->users->select(
+            '*'
+        )->where('status', 1)
+            ->where('email', $email)
+            ->first();
     }
 
 }

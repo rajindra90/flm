@@ -12,7 +12,7 @@ namespace App\Repositories\Contracts;
 interface FriendsRepositoryInterface
 {
 
-    public function createFriendRequest(array $data);
+    public function createFriendRequest(array $data, $email);
 
     public function getFriendId($email);
 
@@ -23,5 +23,11 @@ interface FriendsRepositoryInterface
     public function deleteFriend($data, $id);
 
     public function getFriendRequestById($userId);
+
+    public function acceptRequest($data, $id);
+
+    public function requestEmailAccept($tokan);
+
+    public function getFriendDetailsByToken($token);
 
 }

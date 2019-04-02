@@ -3,39 +3,34 @@
     <div class="container">
         <div class="row">
 
-            <!--<span><router-link :to="{name : 'logout'}">Logout</router-link></span>-->
             <div class="navbar navbar-expand-lg navbar-light bg-light">
-                <h2>Friend List Manager</h2>
+                <div class="col-md-12">
+                    <h2>Friend List Manager</h2>
+                </div>
+                <div class="col-md-10">
+                    <table class="float-right">
+                        <tr>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal"
+                                        data-target="#inviteToFrnds">
+                                    Invite Friends
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal"
+                                        data-target="#requestList">
+                                    Request List
+                                </button>
+                            </td>
 
-                <table class="float-right">
-                    <tr>
-                        <!--<td>
-                            <form class="form-inline my-2 my-lg-3">
-                                <input class="form-control mr-sm-2" type="search" placeholder="Search"
-                                       aria-label="Search">
-                                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                            </form>
-                        </td>-->
-                        <td>
-                            <button type="button" class="btn btn-primary" data-toggle="modal"
-                                    data-target="#inviteToFrnds">
-                                Invite Friends
-                            </button>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-primary" data-toggle="modal"
-                                    data-target="#requestList">
-                                Request List
-                            </button>
-                        </td>
-
-                        <td>
-                            <a type="button" class="btn btn-danger">
-                                <span><router-link :to="{name : 'logout'}">Logout</router-link></span>
-                            </a>
-                        </td>
-                    </tr>
-                </table>
+                            <td>
+                                <a type="button" class="btn btn-danger">
+                                    <span><router-link :to="{name : 'logout'}">Logout</router-link></span>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -183,8 +178,8 @@
                     invite_email: this.inviteEmail
                 }).then(response => {
                     this.success = true
-                    this.has_error = true
-                    this.success_msg = 'Friend request has been sent'
+                    this.has_error = false
+                    this.success_msg = response.data.message
                     this.inviteEmail = ''
                 }).catch(error => {
                     this.has_error = true

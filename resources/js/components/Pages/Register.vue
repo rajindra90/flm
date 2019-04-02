@@ -5,10 +5,23 @@
                 <div class="card card-signin my-5">
                     <div class="card-body">
                         <h5 class="card-title text-center">Sign Up</h5>
+                        <div class="card-body" v-if="success">
+                            <div class="alert alert-success">
+                                <p v-if="success">{{success_msg}}</p>
+                            </div>
+                            <a class="btn btn-lg btn-primary btn-block" href="#/register" @click="resendEmail()">Resend Confirmation Email</a>
+                            <a class="btn btn-lg btn-danger btn-block text-uppercase" href="#/">Sign In</a>
+                        </div>
                         <form class="form-signin" autocomplete="off" @submit.prevent="register" v-if="!success"
                               method="post">
+                            <div class="card-body" v-if="has_error && !success">
+                                <div class="alert alert-danger">
+                                    <p v-if="has_error">{{error}}</p>
+                                </div>
+                            </div>
+
                             <div class="form-label-group">
-                                <input type="text" id="firstName" class="form-control" placeholder="First Name"
+                                <input type="text" id="firstName" name="firstName" class="form-control" placeholder="First Name"
                                        v-model="firstName">
                                 <label for="firstName">First Name</label>
                                 <span class="help-block"
@@ -16,7 +29,7 @@
                             </div>
 
                             <div class="form-label-group">
-                                <input type="text" id="lastName" class="form-control" placeholder="Last Name"
+                                <input type="text" id="lastName" name="lastName" class="form-control" placeholder="Last Name"
                                        v-model="lastName">
                                 <label for="lastName">Last Name</label>
                                 <span class="help-block"
@@ -24,14 +37,14 @@
                             </div>
 
                             <div class="form-label-group">
-                                <input type="email" id="inputEmail" class="form-control" placeholder="Email address"
+                                <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email address"
                                        v-model="email">
                                 <label for="inputEmail">Email address</label>
                                 <span class="help-block" v-if="has_error && errors.email">{{ errors.email }}</span>
                             </div>
 
                             <div class="form-label-group">
-                                <input type="password" id="inputPassword" class="form-control" placeholder="Password"
+                                <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password"
                                        v-model="password">
                                 <label for="inputPassword">Password</label>
                                 <span class="help-block"
@@ -39,13 +52,13 @@
                             </div>
 
                             <div class="form-label-group">
-                                <input type="password" id="confirmPassword" class="form-control"
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control"
                                        placeholder="Confirm Password" v-model="confirmPassword">
                                 <label for="confirmPassword">Confirm Password</label>
                                 <span class="help-block" v-if="has_error && errors.confirm_password">{{ errors.confirm_password }}</span>
                             </div>
 
-                            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Sign Up
+                            <button class="btn btn-lg btn-primary btn-block text-uppercase" name="signUp" type="submit">Sign Up
                             </button>
                             <hr class="my-4">
                             <a class="btn btn-lg btn-danger btn-block text-uppercase" href="#/">Sign In</a>
@@ -69,6 +82,7 @@
                 confirmPassword: '',
                 has_error: false,
                 error: '',
+                success_msg: '',
                 errors: {},
                 success: false
             }
@@ -85,9 +99,24 @@
                     }
                 }).then(response => {
                     this.success = true
+                    this.success_msg = response.data.message
                 }).catch(error => {
                     this.has_error = true;
-                    this.error = error.response.data.error
+                    this.error = error.response.data.message
+                    this.errors = error.response.data.errors || {}
+                })
+            },
+            resendEmail(){
+                this.$store.dispatch('resendEmail', {
+                    data: {
+                        email: this.email
+                    }
+                }).then(response => {
+                    this.success = true
+                    this.success_msg = response.data.message
+                }).catch(error => {
+                    this.has_error = true;
+                    this.error = error.response.data.message
                     this.errors = error.response.data.errors || {}
                 })
             }

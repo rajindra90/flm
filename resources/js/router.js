@@ -7,6 +7,7 @@ import LogOut from './components/Pages/LogOut'
 import FriendsList from './components/Pages/FriendsList'
 import NotFound from './components/Pages/404'
 import Confirm from './components/Pages/Confirm'
+import NotConfirm from './components/Pages/NotConfirm'
 
 
 const routes = [
@@ -50,6 +51,11 @@ const routes = [
         path: '/confirm',
         name: 'confirm',
         component: Confirm,
+    },
+    {
+        path: '/notconfirm',
+        name: 'notconfirm',
+        component: NotConfirm,
     }
 ];
 

@@ -31,7 +31,7 @@ class ConfirmAccount extends Mailable
      */
     public function build()
     {
-        $this->user->url=url('/api/confirmemail?token=').$this->user->email_verified_token;
+        $this->user->url = url('/api/confirmemail?token=') . $this->user->email_verified_token;
         return $this->view('emails.confirm')->with('user', $this->user);
     }
 }
